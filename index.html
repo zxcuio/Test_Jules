@@ -135,18 +135,14 @@
                 </div>
 
                 <div id="weighting-options" style="display:none;">
-                    <div class="form-group">
-                        <label>上司・先輩の人数 (人)</label>
-                        <input type="number" id="manager-count" placeholder="例: 1">
+                    <div id="group-container">
+                        <!-- Dynamic groups will be inserted here -->
                     </div>
+                    <button class="btn" onclick="warikanCalc.addGroup()" style="width: 100%; margin-bottom: 15px; background-color: #f1f3f4; color: #202124;">＋ グループを追加</button>
+
                     <div class="form-group">
-                        <label>支払比率 (上司 : 部下)</label>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <input type="number" id="manager-ratio" value="2" style="width: 60px;">
-                            <span>:</span>
-                            <input type="number" id="regular-ratio" value="1" style="width: 60px;" readonly>
-                        </div>
-                        <small style="color: #666; font-size: 0.8em;">上司が部下の何倍払うか設定</small>
+                         <label>その他の参加者（比率 1）</label>
+                         <p style="padding: 10px; background: #f8f9fa; border-radius: 4px;">残り: <span id="regular-count-display">-</span> 人</p>
                     </div>
                 </div>
 
@@ -157,8 +153,8 @@
                         <p>一人当たり: <span id="per-person" class="highlight">0</span> 円</p>
                     </div>
                     <div id="weighted-result" style="display:none;">
-                        <p>上司 (1人あたり): <span id="manager-pay" class="highlight">0</span> 円</p>
-                        <p>部下 (1人あたり): <span id="regular-pay" class="highlight">0</span> 円</p>
+                        <div id="weighted-result-list"></div>
+                        <p>その他 (1人あたり): <span id="regular-pay" class="highlight">0</span> 円</p>
                     </div>
                     <p>余り: <span id="remainder">0</span> 円</p>
                 </div>
