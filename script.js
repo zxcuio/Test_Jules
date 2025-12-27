@@ -502,11 +502,7 @@ const warikanCalc = {
             // Usually "Remainder" in Warikan means "The amount that couldn't be split evenly".
             // If I collect 1200 for 1000 bill, the "Remainder" is 200 (surplus).
 
-            if (round100) {
-                remainder = currentTotal - total;
-            } else {
-                remainder = total - currentTotal;
-            }
+            remainder = currentTotal - total;
 
             document.getElementById('weighted-result-list').innerHTML = resultHtml;
             document.getElementById('regular-pay').innerText = regularPay.toLocaleString();
@@ -519,13 +515,10 @@ const warikanCalc = {
 
             if (round100) {
                 perPerson = Math.ceil(perPerson / 100) * 100;
-                // Total collected = perPerson * people
-                // Surplus = (perPerson * people) - total
-                remainder = (perPerson * people) - total;
             } else {
                 perPerson = Math.floor(perPerson);
-                remainder = total % people;
             }
+            remainder = (perPerson * people) - total;
 
             document.getElementById('per-person').innerText = perPerson.toLocaleString();
 
