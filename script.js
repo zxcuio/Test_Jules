@@ -70,6 +70,10 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+        document.getElementById(tab.dataset.tab).classList.add('active');
+    });
+});
+
 // Standard & Scientific Calculator
 const calc = {
     display: document.getElementById('calc-display'),
@@ -215,6 +219,8 @@ const calc = {
             const values = Object.values(scope);
 
             // Normalize input
+            // Replace ^ with **
+            // Handle scientific notation E -> e? No, button outputs E. JS uses e or E.
             let expr = this.currentInput;
 
             // Replace ^ with **
