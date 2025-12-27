@@ -1,0 +1,225 @@
+:root {
+    --bg-color: #f0f2f5;
+    --container-bg: #ffffff;
+    --primary-color: #007bff;
+    --text-color: #333;
+    --display-bg: #222;
+    --display-text: #fff;
+    --btn-bg: #e0e0e0;
+    --btn-hover: #d0d0d0;
+    --op-color: #ff9500;
+    --op-hover: #e08400;
+    --func-color: #555;
+    --func-text: #fff;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background-color: var(--container-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 360px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.tabs {
+    display: flex;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ddd;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    color: #888;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+    margin-bottom: -2px;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.display {
+    background-color: var(--display-bg);
+    color: var(--display-text);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: right;
+}
+
+#calc-display, #hex-display {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--display-text);
+    font-size: 18px;
+    text-align: right;
+    margin-bottom: 5px;
+    outline: none;
+}
+
+#calc-result, #hex-result {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#dec-preview {
+    font-size: 12px;
+    color: #aaa;
+    margin-top: 4px;
+}
+
+.buttons {
+    display: grid;
+    gap: 10px;
+}
+
+.grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.grid-5 {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.calc-mode {
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+#deg-rad-btn {
+    background: none;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+#deg-rad-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn {
+    padding: 15px 0;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: var(--btn-bg);
+    transition: background-color 0.2s;
+}
+
+.btn:hover {
+    background-color: var(--btn-hover);
+}
+
+.btn.op {
+    background-color: var(--op-color);
+    color: white;
+}
+
+.btn.op:hover {
+    background-color: var(--op-hover);
+}
+
+.btn.func {
+    background-color: var(--func-color);
+    color: var(--func-text);
+    font-size: 14px;
+}
+
+.btn.equal {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn.clear {
+    background-color: #ff3b30;
+    color: white;
+}
+
+.hex-mode-label {
+    font-size: 10px;
+    color: #aaa;
+    text-align: left;
+    margin-bottom: 4px;
+}
+
+/* Warikan Styles */
+.warikan-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.form-group label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.form-group input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.action-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+}
+
+.result-box {
+    background-color: #e8f0fe;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.highlight {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary-color);
+}
