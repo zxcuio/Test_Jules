@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多機能電卓</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="calculator">関数電卓</button>
+            <button class="tab-btn" data-tab="hex">16進数</button>
+            <button class="tab-btn" data-tab="warikan">割り勘</button>
+        </div>
+
+        <!-- 電卓（標準＋関数） -->
+        <div id="calculator" class="tab-content active">
+            <div class="display">
+                <div class="history-icon">🕒</div>
+                <input type="text" id="calc-display" readonly placeholder="0">
+                <div id="calc-result">= 0</div>
+            </div>
+
+            <div class="calc-grid">
+                <!-- Row 1 -->
+                <div class="rad-toggle">
+                    <button id="deg-rad-btn" class="btn func small-text" onclick="calc.toggleMode()">Deg</button>
+                    <span class="separator">|</span>
+                    <span id="rad-indicator" class="mode-text">Rad</span>
+                </div>
+                <button class="btn func" onclick="calc.appendFunc('fact')">x!</button>
+                <button class="btn func" onclick="calc.append('(')">(</button>
+                <button class="btn func" onclick="calc.append(')')">)</button>
+                <button class="btn func" onclick="calc.append('%')">%</button>
+                <button class="btn func" onclick="calc.clear()">AC</button>
+
+                <!-- Row 2 -->
+                <button class="btn func" onclick="calc.toggleInv()" id="btn-inv">Inv</button>
+                <button class="btn func" onclick="calc.appendFunc('sin')" id="btn-sin">sin</button>
+                <button class="btn func" onclick="calc.appendFunc('ln')" id="btn-ln">ln</button>
+                <button class="btn num" onclick="calc.append('7')">7</button>
+                <button class="btn num" onclick="calc.append('8')">8</button>
+                <button class="btn num" onclick="calc.append('9')">9</button>
+                <button class="btn op" onclick="calc.append('/')">÷</button>
+
+                <!-- Row 3 -->
+                <button class="btn func" onclick="calc.appendConstant('PI')">π</button>
+                <button class="btn func" onclick="calc.appendFunc('cos')" id="btn-cos">cos</button>
+                <button class="btn func" onclick="calc.appendFunc('log')" id="btn-log">log</button>
+                <button class="btn num" onclick="calc.append('4')">4</button>
+                <button class="btn num" onclick="calc.append('5')">5</button>
+                <button class="btn num" onclick="calc.append('6')">6</button>
+                <button class="btn op" onclick="calc.append('*')">×</button>
+
+                <!-- Row 4 -->
+                <button class="btn func" onclick="calc.appendConstant('E')">e</button>
+                <button class="btn func" onclick="calc.appendFunc('tan')" id="btn-tan">tan</button>
+                <button class="btn func" onclick="calc.appendFunc('sqrt')" id="btn-sqrt">√</button>
+                <button class="btn num" onclick="calc.append('1')">1</button>
+                <button class="btn num" onclick="calc.append('2')">2</button>
+                <button class="btn num" onclick="calc.append('3')">3</button>
+                <button class="btn op" onclick="calc.append('-')">−</button>
+
+                <!-- Row 5 -->
+                <button class="btn func" onclick="calc.appendAns()">Ans</button>
+                <button class="btn func" onclick="calc.append('E')">EXP</button>
+                <button class="btn func" onclick="calc.appendFunc('pow')" id="btn-pow">xʸ</button>
+                <button class="btn num" onclick="calc.append('0')">0</button>
+                <button class="btn num" onclick="calc.append('.')">.</button>
+                <button class="btn equal" onclick="calc.calculate()">=</button>
+                <button class="btn op" onclick="calc.append('+')">+</button>
+            </div>
+        </div>
+
+        <!-- 16進数 -->
+        <div id="hex" class="tab-content">
+            <div class="display">
+                <div class="hex-mode-label">HEX Mode</div>
+                <input type="text" id="hex-display" readonly placeholder="0">
+                <div id="hex-result">= 0</div>
+                <div id="dec-preview">DEC: 0</div>
+            </div>
+             <div class="buttons grid-4">
+                <button class="btn clear" onclick="hexCalc.clear()" style="grid-column: span 1;">AC</button>
+                <button class="btn" onclick="hexCalc.backspace()" style="grid-column: span 1;">⌫</button>
+                <button class="btn" style="visibility: hidden;"></button>
+                <button class="btn op" onclick="hexCalc.appendOp('/')">÷</button>
+
+                <button class="btn hex-num" onclick="hexCalc.append('A')">A</button>
+                <button class="btn hex-num" onclick="hexCalc.append('B')">B</button>
+                <button class="btn hex-num" onclick="hexCalc.append('C')">C</button>
+                <button class="btn op" onclick="hexCalc.appendOp('*')">×</button>
+
+                <button class="btn hex-num" onclick="hexCalc.append('D')">D</button>
+                <button class="btn hex-num" onclick="hexCalc.append('E')">E</button>
+                <button class="btn hex-num" onclick="hexCalc.append('F')">F</button>
+                <button class="btn op" onclick="hexCalc.appendOp('-')">-</button>
+
+                <button class="btn num" onclick="hexCalc.append('7')">7</button>
+                <button class="btn num" onclick="hexCalc.append('8')">8</button>
+                <button class="btn num" onclick="hexCalc.append('9')">9</button>
+                <button class="btn op" onclick="hexCalc.appendOp('+')">+</button>
+
+                <button class="btn num" onclick="hexCalc.append('4')">4</button>
+                <button class="btn num" onclick="hexCalc.append('5')">5</button>
+                <button class="btn num" onclick="hexCalc.append('6')">6</button>
+                <button class="btn equal" onclick="hexCalc.calculate()" style="grid-row: span 2;">=</button>
+
+                <button class="btn num" onclick="hexCalc.append('1')">1</button>
+                <button class="btn num" onclick="hexCalc.append('2')">2</button>
+                <button class="btn num" onclick="hexCalc.append('3')">3</button>
+
+                <button class="btn num" onclick="hexCalc.append('0')" style="grid-column: span 3;">0</button>
+            </div>
+        </div>
+
+        <!-- 割り勘 -->
+        <div id="warikan" class="tab-content">
+            <h2>割り勘計算</h2>
+            <div class="warikan-form">
+                <div class="form-group">
+                    <label>合計金額 (円)</label>
+                    <input type="number" id="total-amount" placeholder="例: 10000">
+                </div>
+                <div class="form-group">
+                    <label>人数 (人)</label>
+                    <input type="number" id="people-count" placeholder="例: 3">
+                </div>
+                <button class="btn action-btn" onclick="warikanCalc.calculate()">計算する</button>
+
+                <div id="warikan-result" class="result-box" style="display:none;">
+                    <p>一人当たり: <span id="per-person" class="highlight">0</span> 円</p>
+                    <p>余り: <span id="remainder">0</span> 円</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
