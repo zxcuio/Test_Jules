@@ -467,11 +467,12 @@ const warikanCalc = {
                  return;
             }
 
-            let regularPay = total / denominator;
+            const rawRegularPay = total / denominator;
+            let regularPay;
             if (round100) {
-                regularPay = Math.ceil(regularPay / 100) * 100;
+                regularPay = Math.ceil(rawRegularPay / 100) * 100;
             } else {
-                regularPay = Math.floor(regularPay);
+                regularPay = Math.floor(rawRegularPay);
             }
 
             // Calculate total paid so far
@@ -480,7 +481,7 @@ const warikanCalc = {
             // Generate result HTML
             let resultHtml = '';
             specialGroups.forEach((g, i) => {
-                let pay = regularPay * g.ratio;
+                let pay = rawRegularPay * g.ratio;
                 if (round100) {
                     pay = Math.ceil(pay / 100) * 100;
                 } else {
@@ -502,7 +503,7 @@ const warikanCalc = {
             // Usually "Remainder" in Warikan means "The amount that couldn't be split evenly".
             // If I collect 1200 for 1000 bill, the "Remainder" is 200 (surplus).
 
-            remainder = currentTotal - total;
+            remainder = Math.ceil(currentTotal - total);
 
             document.getElementById('weighted-result-list').innerHTML = resultHtml;
             document.getElementById('regular-pay').innerText = regularPay.toLocaleString();
@@ -518,7 +519,7 @@ const warikanCalc = {
             } else {
                 perPerson = Math.floor(perPerson);
             }
-            remainder = (perPerson * people) - total;
+            remainder = Math.ceil((perPerson * people) - total);
 
             document.getElementById('per-person').innerText = perPerson.toLocaleString();
 
