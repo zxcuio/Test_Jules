@@ -17,17 +17,50 @@ const calc = {
     display: document.getElementById('calc-display'),
     result: document.getElementById('calc-result'),
     degRadBtn: document.getElementById('deg-rad-btn'),
+    radIndicator: document.getElementById('rad-indicator'),
     currentInput: '',
+    ans: 0, // Store previous answer
     isDeg: true,
+    isInv: false,
 
     toggleMode() {
         this.isDeg = !this.isDeg;
-        this.degRadBtn.innerText = this.isDeg ? 'DEG' : 'RAD';
+        // Update UI
+        if (this.isDeg) {
+            this.degRadBtn.style.color = '#202124';
+            this.degRadBtn.style.fontWeight = 'bold';
+            this.radIndicator.style.color = '#5f6368';
+            this.radIndicator.style.fontWeight = 'normal';
+        } else {
+            this.degRadBtn.style.color = '#5f6368';
+            this.degRadBtn.style.fontWeight = 'normal';
+            this.radIndicator.style.color = '#202124';
+            this.radIndicator.style.fontWeight = 'bold';
+        }
         this.calculate(); // Recalculate if result is there
+    },
+
+    toggleInv() {
+        this.isInv = !this.isInv;
+        document.getElementById('btn-inv').style.background = this.isInv ? '#bdc1c6' : ''; // Darker when active
+
+        // Update button labels
+        document.getElementById('btn-sin').innerText = this.isInv ? 'sin⁻¹' : 'sin';
+        document.getElementById('btn-cos').innerText = this.isInv ? 'cos⁻¹' : 'cos';
+        document.getElementById('btn-tan').innerText = this.isInv ? 'tan⁻¹' : 'tan';
+        document.getElementById('btn-ln').innerText = this.isInv ? 'eˣ' : 'ln';
+        document.getElementById('btn-log').innerText = this.isInv ? '10ˣ' : 'log';
+        document.getElementById('btn-sqrt').innerText = this.isInv ? 'x²' : '√';
+        document.getElementById('btn-pow').innerText = this.isInv ? 'ʸ√x' : 'xʸ';
     },
 
     append(val) {
         this.currentInput += val;
+        this.updateDisplay();
+    },
+
+    appendAns() {
+        this.currentInput += 'Ans';
         this.updateDisplay();
     },
 
@@ -37,13 +70,28 @@ const calc = {
     },
 
     appendFunc(func) {
-        if (func === 'pow') {
-            this.currentInput += '^';
-        } else if (func === 'fact') {
-            this.currentInput += 'fact(';
+        let text = '';
+        if (this.isInv) {
+            switch(func) {
+                case 'sin': text = 'asin('; break;
+                case 'cos': text = 'acos('; break;
+                case 'tan': text = 'atan('; break;
+                case 'ln': text = 'exp('; break; // e^x
+                case 'log': text = 'tenpow('; break; // 10^x
+                case 'sqrt': text = 'sq('; break; // x^2
+                case 'pow': text = 'root('; break; // y root of x? actually x^(1/y)
+                default: text = func + '(';
+            }
         } else {
-            this.currentInput += func + '(';
+            if (func === 'pow') {
+                text = '^';
+            } else if (func === 'fact') {
+                text = 'fact(';
+            } else {
+                text = func + '(';
+            }
         }
+        this.currentInput += text;
         this.updateDisplay();
     },
 
@@ -76,58 +124,73 @@ const calc = {
             if (!this.currentInput) return;
 
             const isDeg = this.isDeg;
+            const ansValue = this.ans;
 
             // Define math functions in scope
             const scope = {
                 sin: function(x) { return isDeg ? Math.sin(x * Math.PI / 180) : Math.sin(x); },
                 cos: function(x) { return isDeg ? Math.cos(x * Math.PI / 180) : Math.cos(x); },
                 tan: function(x) { return isDeg ? Math.tan(x * Math.PI / 180) : Math.tan(x); },
+                asin: function(x) { return isDeg ? Math.asin(x) * 180 / Math.PI : Math.asin(x); },
+                acos: function(x) { return isDeg ? Math.acos(x) * 180 / Math.PI : Math.acos(x); },
+                atan: function(x) { return isDeg ? Math.atan(x) * 180 / Math.PI : Math.atan(x); },
                 log: function(x) { return Math.log10(x); },
                 ln: function(x) { return Math.log(x); },
+                exp: function(x) { return Math.exp(x); },
+                tenpow: function(x) { return Math.pow(10, x); },
                 sqrt: function(x) { return Math.sqrt(x); },
+                sq: function(x) { return x * x; },
                 pow: function(b, e) { return Math.pow(b, e); },
+                root: function(x, y) { return Math.pow(x, 1/y); }, // y root of x
                 fact: function(n) {
                     if (n < 0) return NaN;
                     let res = 1;
                     for (let i = 2; i <= n; i++) res *= i;
                     return res;
                 },
+                Ans: ansValue,
                 PI: Math.PI,
                 E: Math.E
             };
 
-            // Build evaluation function
-            // We use 'with' to easily expose scope properties to evaluation context.
-            // Note: 'with' is deprecated in strict mode, so we use new Function with destructuring or arguments.
-            // A cleaner way for new Function is passing keys as args.
-
             const keys = Object.keys(scope);
             const values = Object.values(scope);
 
-            // Replace ^ with ** for power if used as operator, but we have pow() too.
-            // If user typed '2^3', JS eval handles ^ as bitwise XOR.
-            // So we must replace ^ with **
-            let expr = this.currentInput.replace(/\^/g, '**');
+            // Normalize input
+            // Replace ^ with **
+            // Handle scientific notation E -> e? No, button outputs E. JS uses e or E.
+            let expr = this.currentInput;
 
-            // Handle implied multiplication for things like 2PI, 2sin(x) is hard without a parser.
-            // For now, assume explicit operators, except maybe ) ( which isn't standard in JS.
+            // Replace ^ with **
+            expr = expr.replace(/\^/g, '**');
+
+            // Handle scientific notation.
+            // If we encounter 'E' that is intended as EXP (scientific notation),
+            // it usually follows a number. However, we also have constant 'E'.
+            // In this simple implementation, both use the symbol 'E'.
+            // Standard JS evaluation might treat 2E3 as scientific notation if E was not a variable.
+            // Since we define E in scope, we need to be careful.
+            // A simple heuristic: if E is preceded by a number, treat as e (scientific).
+            // This is not perfect but covers common use cases like 2E5.
+            // Note: This replaces all occurrences.
+            expr = expr.replace(/(\d)E(\+?-?\d)/g, '$1e$2');
 
             const func = new Function(...keys, 'return ' + expr);
             const res = func(...values);
 
+            this.ans = res; // Update Ans
+
             // Format result
             let resStr = res.toString();
-            // Round if very close to integer due to float precision (e.g. sin(180) in deg)
             if (Math.abs(res - Math.round(res)) < 1e-10) {
                  resStr = Math.round(res).toString();
             } else {
-                 // Limit decimal places
                  resStr = parseFloat(res.toFixed(10)).toString();
             }
 
             this.result.innerText = '= ' + resStr;
         } catch (e) {
-            console.error(e);
+            // console.error(e);
             this.result.innerText = 'Error';
         }
     }
@@ -170,7 +233,6 @@ const hexCalc = {
 
     updatePreview() {
         try {
-            // Attempt to parse the last number entered
             const parts = this.currentInput.split(' ');
             const lastNum = parts[parts.length - 1];
             if (lastNum && /^[0-9A-Fa-f]+$/.test(lastNum)) {
@@ -188,27 +250,11 @@ const hexCalc = {
 
     calculate() {
         try {
-            // Convert Hex numbers to Decimal for calculation
-            // Split by operators +, -, *, /
-            // This is a simple implementation that assumes well-formed input like "A + B"
-
-            // Replace hex numbers with '0x' prefix so JS can evaluate them
-            // We need to be careful not to replace parts of '0x' if already present (though our input prevents that)
-            // And ensure we catch standalone hex numbers.
-
             const expr = this.currentInput.replace(/\b[0-9A-Fa-f]+\b/g, (match) => '0x' + match);
-
             const result = new Function('return ' + expr)();
-
-            // Convert result back to Hex
-            // Use logical shift to handle negative numbers as 32-bit integers if desired, or simple toString
-            // Usually programmer calc handles signed ints.
-            // If result is negative, toString(16) gives "-a".
-            // 2's complement is often expected.
 
             let hexResult;
             if (result < 0) {
-                 // 32-bit 2's complement
                  hexResult = (result >>> 0).toString(16).toUpperCase();
             } else {
                  hexResult = Math.floor(result).toString(16).toUpperCase();
