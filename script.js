@@ -327,19 +327,67 @@ const hexCalc = {
 
 // Warikan Calculator
 const warikanCalc = {
+    toggleWeighting() {
+        const useWeighting = document.getElementById('use-weighting').checked;
+        document.getElementById('weighting-options').style.display = useWeighting ? 'block' : 'none';
+        document.getElementById('warikan-result').style.display = 'none'; // Hide result when toggling
+    },
+
     calculate() {
         const total = parseFloat(document.getElementById('total-amount').value);
         const people = parseInt(document.getElementById('people-count').value);
+        const useWeighting = document.getElementById('use-weighting').checked;
 
         if (!total || !people || people <= 0) {
             alert('有効な数値を入力してください。');
             return;
         }
 
-        const perPerson = Math.floor(total / people);
-        const remainder = total % people;
+        let remainder = 0;
 
-        document.getElementById('per-person').innerText = perPerson.toLocaleString();
+        if (useWeighting) {
+            const managerCount = parseInt(document.getElementById('manager-count').value);
+            const managerRatio = parseFloat(document.getElementById('manager-ratio').value);
+
+            if (!managerCount || managerCount < 0 || managerCount >= people) {
+                alert('上司・先輩の人数を正しく入力してください（0人以上、合計人数未満）。');
+                return;
+            }
+            if (!managerRatio || managerRatio <= 0) {
+                alert('支払比率は0より大きい値を入力してください。');
+                return;
+            }
+
+            const regularCount = people - managerCount;
+            // Equations:
+            // Pay_regular * regularCount + Pay_manager * managerCount = Total
+            // Pay_manager = Pay_regular * managerRatio
+            // => Pay_regular * regularCount + (Pay_regular * managerRatio) * managerCount = Total
+            // => Pay_regular * (regularCount + managerRatio * managerCount) = Total
+            // => Pay_regular = Total / (regularCount + managerRatio * managerCount)
+
+            const regularPay = Math.floor(total / (regularCount + managerRatio * managerCount));
+            const managerPay = Math.floor(regularPay * managerRatio);
+
+            const currentTotal = regularPay * regularCount + managerPay * managerCount;
+            remainder = total - currentTotal;
+
+            document.getElementById('manager-pay').innerText = managerPay.toLocaleString();
+            document.getElementById('regular-pay').innerText = regularPay.toLocaleString();
+
+            document.getElementById('simple-result').style.display = 'none';
+            document.getElementById('weighted-result').style.display = 'block';
+
+        } else {
+            const perPerson = Math.floor(total / people);
+            remainder = total % people;
+
+            document.getElementById('per-person').innerText = perPerson.toLocaleString();
+
+            document.getElementById('simple-result').style.display = 'block';
+            document.getElementById('weighted-result').style.display = 'none';
+        }
+
         document.getElementById('remainder').innerText = remainder.toLocaleString();
         document.getElementById('warikan-result').style.display = 'block';
     }
