@@ -413,6 +413,7 @@ const warikanCalc = {
         const total = parseFloat(document.getElementById('total-amount').value);
         const people = parseInt(document.getElementById('people-count').value);
         const useWeighting = document.getElementById('use-weighting').checked;
+        const round100 = document.getElementById('round-100').checked;
 
         if (!total || !people || people <= 0) {
             alert('有効な数値を入力してください。');
@@ -466,7 +467,12 @@ const warikanCalc = {
                  return;
             }
 
-            const regularPay = Math.floor(total / denominator);
+            let regularPay = total / denominator;
+            if (round100) {
+                regularPay = Math.ceil(regularPay / 100) * 100;
+            } else {
+                regularPay = Math.floor(regularPay);
+            }
 
             // Calculate total paid so far
             let currentTotal = regularPay * regularCount;
@@ -474,7 +480,13 @@ const warikanCalc = {
             // Generate result HTML
             let resultHtml = '';
             specialGroups.forEach((g, i) => {
-                const pay = Math.floor(regularPay * g.ratio);
+                let pay = regularPay * g.ratio;
+                if (round100) {
+                    pay = Math.ceil(pay / 100) * 100;
+                } else {
+                    pay = Math.floor(pay);
+                }
+
                 currentTotal += pay * g.count;
                 // Add to result list
                 // Find label or just use Group index
@@ -482,7 +494,19 @@ const warikanCalc = {
                 resultHtml += `<p>${label} (1人あたり): <span class="highlight">${pay.toLocaleString()}</span> 円</p>`;
             });
 
-            remainder = total - currentTotal;
+            // If rounding up, we might collect more than total, so remainder (surplus) is currentTotal - total
+            // If normal (floor), we collect less, so remainder is total - currentTotal
+            // To be consistent: Remainder usually means "Money left over" or "Shortage".
+            // If round100 (Ceil), we have excess. Remainder = currentTotal - total (Surplus)
+            // If normal (Floor), we have shortage (but kept as 'remainder' to be paid by organizer?).
+            // Usually "Remainder" in Warikan means "The amount that couldn't be split evenly".
+            // If I collect 1200 for 1000 bill, the "Remainder" is 200 (surplus).
+
+            if (round100) {
+                remainder = currentTotal - total;
+            } else {
+                remainder = total - currentTotal;
+            }
 
             document.getElementById('weighted-result-list').innerHTML = resultHtml;
             document.getElementById('regular-pay').innerText = regularPay.toLocaleString();
@@ -491,8 +515,17 @@ const warikanCalc = {
             document.getElementById('weighted-result').style.display = 'block';
 
         } else {
-            const perPerson = Math.floor(total / people);
-            remainder = total % people;
+            let perPerson = total / people;
+
+            if (round100) {
+                perPerson = Math.ceil(perPerson / 100) * 100;
+                // Total collected = perPerson * people
+                // Surplus = (perPerson * people) - total
+                remainder = (perPerson * people) - total;
+            } else {
+                perPerson = Math.floor(perPerson);
+                remainder = total % people;
+            }
 
             document.getElementById('per-person').innerText = perPerson.toLocaleString();
 
