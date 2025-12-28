@@ -1,0 +1,21 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "Calculator App with Prisma",
+  "main": "lib/prisma.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "migrate:dev": "prisma migrate dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.10.2"
+  },
+  "devDependencies": {
+    "prisma": "^5.10.2"
+  }
+}
